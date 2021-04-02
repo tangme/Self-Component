@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TTag 示例</title>
+  <script src="./ttag.js"></script>
+  <link href="./ttag.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+  <ul class="t-tag-con" id="ttag" style="display: inline-block;vertical-align: top;padding: 2px 0;">
+    <div class="t-tag-select-item-con close-ttag">
+      <input type="hidden" autocomplete="off" />
+    </div>
+  </ul>
+  <button type="button" class="btn-save">保 存1</button>
+</body>
+<script>
+  var TTAG = new Ttag({
+    el: '#ttag', maxSize: 3, value: 'hello,tag', data: ['hello', 'javascript', 'css', 'html'], url: '', onClose: function (delVal) {
+      console.log(`${delVal} 值被删除了.`);
+    }, onTagClick: function (tagVal) { console.log(`${tagVal} 标签被点击`) }, onAdd: function (curVal, formVal) {
+      console.log(`${curVal} ${formVal}`)
+    }
+  });
+
+  document.querySelector('.btn-save').addEventListener('click', function () {
+    console.log('click...');
+    var formdata = TTAG.getFormData()
+    console.log(formdata)
+  })
+</script>
+
+</html>
