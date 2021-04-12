@@ -39,9 +39,24 @@
 	background: #e0eaf1;
 }
 
+.edit-item-del-con {
+	position: absolute;
+	width: 21px;
+	height: 21px;
+	right: 0;
+	cursor: pointer;
+}
+.edit-item-del-con:hover {
+	background-color: red;
+}
+.edit-item-del-con:hover .edit-item-del,
+.edit-item-del-con:hover .edit-item-del::after {
+	background-color: #ffffff;
+}
+
 .edit-item-del {
 	position: absolute;
-	right: 8px;
+	/* right: 8px; */
 	top: 60%;
 	display: inline-block;
 	width: 16px;
@@ -53,7 +68,7 @@
 	cursor: pointer;
 }
 .edit-item-del:hover {
-	background: red;
+	/* background: red; */
 }
 
 .edit-item-del::after {
@@ -72,7 +87,7 @@
 	position: absolute;
 	border: 1px solid #eee;
 	width: 100%;
-	height: 50px;
+	/* height: 150px; */
 	left: 0;
 	top: 100%;
 	margin-top: 14px;

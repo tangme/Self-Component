@@ -3,7 +3,7 @@ function Ttag(opt) {
 	/*var data = opt.data;
     var url = opt.url;*/
 	this.opt = opt;
-	this.pattern = "&,&";
+	this.pattern = this.opt.pattern || "&,&";
 	this.editarea = document.querySelector(elementid);
 	this.selectArea = this.editarea.querySelector(".t-tag-select-item-con"); //选择区域块，用来显示默认的标签
 	this.inputForm = this.selectArea.querySelector("input"); //隐藏的表单，用来存储实际值
@@ -17,7 +17,46 @@ function Ttag(opt) {
 	if (opt.value) {
 		this.setData(opt.value);
 	}
+	if (opt.url) {
+		this.ajax({
+			url: opt.url,
+			onLoaded: opt.onLoaded ? opt.onLoaded : null,
+		});
+	}
 }
+Ttag.prototype.ajax = function ({ method = "post", url, data, onLoaded, flag = true }) {
+	var xhr = null,
+		$this = this; //创建一个ajax对象
+	//-------先封装兼容IE版本
+	if (window.XMLHttpRequest) {
+		xhr = new XMLHttpRequest();
+	} else {
+		xhr = new ActiveXObject("Microsoft.XMLHttp");
+	}
+	//3.open过程
+	if (method == "GET") {
+		xhr.open(method, url + "?" + data, flag);
+		//4.send过程
+		xhr.send();
+	} else if (method == "post") {
+		//3.open过程
+		xhr.open(method, url, flag);
+		xhr.setRequestHeader("Content-type", "application/json");
+		// xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		//4.send过程
+		xhr.send(data);
+	}
+	//5.监听
+	//由于send是一个异步的过程所以不能用xhr.readyState == 4来判断
+	xhr.onreadystatechange = function () {
+		if (xhr.readyState == 4) {
+			if (xhr.status == 200) {
+				onLoaded && onLoaded(xhr.responseText, $this);
+			}
+		}
+	};
+};
+
 Ttag.prototype.setData = function (value) {
 	var arr = value.split(",");
 	for (var index in arr) {
@@ -62,10 +101,16 @@ Ttag.prototype.init = function () {
 		event.stopPropagation();
 		event.preventDefault();
 		//删除 tag
-		if (event.target.getAttribute("class") === "edit-item-del") {
+		if (event.target.getAttribute("class") === "edit-item-del-con") {
 			var delText = event.target.parentNode.querySelector(".edit-item-text").innerHTML;
 			$this.delFormData(delText);
 			event.target.parentNode.parentNode.removeChild(event.target.parentNode);
+			return;
+		}
+		if (event.target.getAttribute("class") === "edit-item-del") {
+			var delText = event.target.parentNode.parentNode.querySelector(".edit-item-text").innerHTML;
+			$this.delFormData(delText);
+			event.target.parentNode.parentNode.parentNode.removeChild(event.target.parentNode.parentNode);
 			return;
 		}
 		if (event.target.getAttribute("class") === "edit-item-text") {
@@ -106,13 +151,14 @@ Ttag.prototype.delFormData = function (val) {
  * @param  {[type]} data       [description]
  * @return {[type]}            [description]
  */
-Ttag.prototype.loadData = function () {
-	// debugger
+Ttag.prototype.loadData = function (data) {
 	var $this = this;
-	if (this.opt.data) {
+	var tmpData = this.opt.data && this.opt.data.length ? this.opt.data : [];
+	tmpData = data && data.length ? data : [];
+	if (tmpData.length) {
 		var inputVal = "";
 		var fragment = document.createDocumentFragment();
-		this.opt.data.forEach(function (item) {
+		tmpData.forEach(function (item) {
 			inputVal += item + $this.pattern;
 			var textSpan = document.createElement("span");
 			textSpan.setAttribute("class", "t-tag-item");
@@ -120,7 +166,6 @@ Ttag.prototype.loadData = function () {
 			fragment.appendChild(textSpan);
 		});
 		// this.inputForm.value = inputVal;
-		console.log("lallalala");
 
 		this.selectArea.appendChild(fragment);
 	}
@@ -151,7 +196,6 @@ Ttag.prototype.addTag = function (text, fireEvent) {
 	if (this.isDuplicate(text)) {
 		return;
 	}
-	console.log(`size:${this.tag.size}`);
 
 	var li = document.createElement("li");
 	li.setAttribute("class", "edit-item");
@@ -227,6 +271,14 @@ Ttag.prototype.newTag = function () {
 		console.log("焦点移除");
 	});
 
+	tmpInput1.addEventListener("compositionstart", function (e) {
+		$this.delFlag = true;
+	});
+
+	tmpInput1.addEventListener("compositionend", function (e) {
+		$this.delFlag = false;
+	});
+
 	tmpInput1.addEventListener("keyup", function (e) {
 		if (e.keyCode === 13) {
 			console.log("进入回车");
@@ -237,7 +289,14 @@ Ttag.prototype.newTag = function () {
 					$this.editarea.click();
 				});
 			}
-		} else if (e.keyCode === 8) {
+		}
+	});
+
+	tmpInput1.addEventListener("keydown", function (e) {
+		if (e.keyCode === 8) {
+			if (e.target.value.length || $this.delFlag) {
+				return;
+			}
 			//删除前一个标签
 			var childs = $this.editarea.querySelectorAll(".edit-item:not(.input-edit-item)");
 			console.log(childs);
@@ -248,8 +307,8 @@ Ttag.prototype.newTag = function () {
 			}
 		}
 	});
+
 	tmpInput1.addEventListener("click", function (e) {
-		console.log("lalla");
 		e.stopPropagation();
 		e.preventDefault();
 	});
