@@ -1,26 +1,37 @@
-function Ttag(opt) {
-	var elementid = opt.el;
-	/*var data = opt.data;
-    var url = opt.url;*/
-	this.opt = opt;
-	this.pattern = this.opt.pattern || "&,&";
-	this.editarea = document.querySelector(elementid);
+function Ttag({
+	el = undefined, //dom 锚点
+	value, //默认标签
+	url = undefined, //远程标签地址
+	pattern = "&,&",
+	maxSize = 0, //最多标签个数
+	items = [], //默认提供的标签选项
+	onCloseTag = undefined, //关闭标签事件
+	onAddTag = undefined, //增加标签事件
+	onClickTag = undefined, //点击标签事件
+	onLoaded = null, //远程数据加载完毕事件
+}) {
+	if (!el) {
+		console.error("el 参数不能为空！");
+		return;
+	}
+	this.pattern = pattern;
+	this.editarea = document.querySelector(el);
 	this.selectArea = this.editarea.querySelector(".t-tag-select-item-con"); //选择区域块，用来显示默认的标签
 	this.inputForm = this.selectArea.querySelector("input"); //隐藏的表单，用来存储实际值
-	this.tag = { _show: false }; //是否显示 默认标签选择区域块
+	this.tag = { _show: false, items }; //是否显示 默认标签选择区域块
 	this.hideSelTag = this.hideSelTag.bind(this); // 隐藏 默认标签选择区域块
-	this.onClose = this.opt.onClose || undefined;
-	this.onTagClick = this.opt.onTagClick || undefined;
-	this.onAdd = this.opt.onAdd || undefined;
-	this.maxSize = this.opt.maxSize || 0;
+	this.maxSize = maxSize;
+	this.onCloseTag = onCloseTag;
+	this.onClickTag = onClickTag;
+	this.onAddTag = onAddTag;
 	this.init();
-	if (opt.value) {
-		this.setData(opt.value);
+	if (value) {
+		this.setData(value);
 	}
-	if (opt.url) {
+	if (url) {
 		this.ajax({
-			url: opt.url,
-			onLoaded: opt.onLoaded ? opt.onLoaded : null,
+			url,
+			onLoaded,
 		});
 	}
 }
@@ -58,10 +69,24 @@ Ttag.prototype.ajax = function ({ method = "post", url, data, onLoaded, flag = t
 };
 
 Ttag.prototype.setData = function (value) {
-	var arr = value.split(",");
-	for (var index in arr) {
-		this.addTag(arr[index], false);
+	if (Array.isArray(value)) {
+		for (var index in value) {
+			this.addTag(value[index], false);
+		}
 	}
+};
+
+Ttag.prototype.initDOM = function () {
+	let el_input = document.createElement("input");
+	el_input.setAttribute("type", "hidden");
+	el_input.setAttribute("autocomplete", "off");
+
+	let el_div = document.createElement("div");
+	el_div.setAttribute("class", "t-tag-select-item-con close-ttag");
+
+	el_div.appendChild(el_input);
+
+	this.editarea.appendChild(el_div);
 };
 /**
  * [init 初始化]
@@ -69,6 +94,7 @@ Ttag.prototype.setData = function (value) {
  * @return {[type]} [description]
  */
 Ttag.prototype.init = function () {
+	// this.initDOM();
 	var $this = this;
 	Object.defineProperties(this.tag, {
 		show: {
@@ -114,11 +140,11 @@ Ttag.prototype.init = function () {
 			return;
 		}
 		if (event.target.getAttribute("class") === "edit-item-text") {
-			$this.onTagClick && $this.onTagClick(event.target.textContent);
+			$this.onClickTag && $this.onClickTag(event.target.textContent);
 			return;
 		}
 		//显示 提供的tag选项
-		if (!$this.tag.show) {
+		if ($this.tag.items.length && !$this.tag.show) {
 			$this.tag.show = true;
 		}
 		//手动新增 tag
@@ -143,8 +169,13 @@ Ttag.prototype.init = function () {
  */
 Ttag.prototype.delFormData = function (val) {
 	val && (this.inputForm.value = this.inputForm.value.replace(val + this.pattern, ""));
-	this.onClose && this.onClose(val);
+	this.onCloseTag && this.onCloseTag(val);
 };
+
+Ttag.prototype.cleanItems = function () {
+	this.selectArea.innerHTML = "";
+};
+
 /**
  * [loadData 载入数据]
  * @Author tanglv   2020-11-02
@@ -152,13 +183,15 @@ Ttag.prototype.delFormData = function (val) {
  * @return {[type]}            [description]
  */
 Ttag.prototype.loadData = function (data) {
+	this.cleanItems();
 	var $this = this;
-	var tmpData = this.opt.data && this.opt.data.length ? this.opt.data : [];
-	tmpData = data && data.length ? data : [];
-	if (tmpData.length) {
+	// var tmpData = this.tag.items && this.tag.items.length ? this.tag.items : [];
+	// tmpData = data && data.length ? data : tmpData;
+	this.tag.items = data && data.length ? data : this.tag.items;
+	if (this.tag.items.length) {
 		var inputVal = "";
 		var fragment = document.createDocumentFragment();
-		tmpData.forEach(function (item) {
+		this.tag.items.forEach(function (item) {
 			inputVal += item + $this.pattern;
 			var textSpan = document.createElement("span");
 			textSpan.setAttribute("class", "t-tag-item");
@@ -213,7 +246,9 @@ Ttag.prototype.addTag = function (text, fireEvent) {
 	this.editarea.appendChild(li);
 
 	this.inputForm.value = this.inputForm.value + text + this.pattern;
-	this.onAdd && fireEvent !== false && this.onAdd(text, this.inputForm.value);
+	this.onAddTag &&
+		fireEvent !== false &&
+		this.onAddTag(text, this.inputForm.value, this.tag.items.indexOf(text) === -1 ? false : true);
 };
 /**
  * [isDuplicate 检查是否有重复值]
