@@ -5,6 +5,7 @@ function Ttag({
 	pattern = "&,&",
 	maxSize = 0, //最多标签个数
 	items = [], //默认提供的标签选项
+	name, //表单name属性值
 	onCloseTag = undefined, //关闭标签事件
 	onAddTag = undefined, //增加标签事件
 	onClickTag = undefined, //点击标签事件
@@ -16,6 +17,7 @@ function Ttag({
 	}
 	this.pattern = pattern;
 	this.editarea = document.querySelector(el);
+	this.initDOM(name);
 	this.selectArea = this.editarea.querySelector(".t-tag-select-item-con"); //选择区域块，用来显示默认的标签
 	this.inputForm = this.selectArea.querySelector("input"); //隐藏的表单，用来存储实际值
 	this.tag = { _show: false, items }; //是否显示 默认标签选择区域块
@@ -76,10 +78,11 @@ Ttag.prototype.setData = function (value) {
 	}
 };
 
-Ttag.prototype.initDOM = function () {
+Ttag.prototype.initDOM = function (name) {
 	let el_input = document.createElement("input");
 	el_input.setAttribute("type", "hidden");
 	el_input.setAttribute("autocomplete", "off");
+	name && el_input.setAttribute("name", name);
 
 	let el_div = document.createElement("div");
 	el_div.setAttribute("class", "t-tag-select-item-con close-ttag");
@@ -94,7 +97,6 @@ Ttag.prototype.initDOM = function () {
  * @return {[type]} [description]
  */
 Ttag.prototype.init = function () {
-	// this.initDOM();
 	var $this = this;
 	Object.defineProperties(this.tag, {
 		show: {
@@ -160,7 +162,7 @@ Ttag.prototype.init = function () {
 		}
 	});
 
-	this.loadData();
+	this.loadItems();
 };
 
 /**
@@ -173,20 +175,24 @@ Ttag.prototype.delFormData = function (val) {
 };
 
 Ttag.prototype.cleanItems = function () {
-	this.selectArea.innerHTML = "";
+	var childs = this.selectArea.querySelectorAll(".t-tag-item");
+	childs = [].slice.call(childs);
+	if (childs.length) {
+		childs.forEach((item) => {
+			this.selectArea.removeChild(item);
+		});
+	}
 };
 
 /**
- * [loadData 载入数据]
+ * [loadItems 载入供选择的标签数据]
  * @Author tanglv   2020-11-02
  * @param  {[type]} data       [description]
  * @return {[type]}            [description]
  */
-Ttag.prototype.loadData = function (data) {
+Ttag.prototype.loadItems = function (data) {
 	this.cleanItems();
 	var $this = this;
-	// var tmpData = this.tag.items && this.tag.items.length ? this.tag.items : [];
-	// tmpData = data && data.length ? data : tmpData;
 	this.tag.items = data && data.length ? data : this.tag.items;
 	if (this.tag.items.length) {
 		var inputVal = "";

@@ -12,22 +12,19 @@
 
 <body>
   <ul class="t-tag-con" id="ttag" style="display: inline-block;vertical-align: top;padding: 2px 0;">
-    <div class="t-tag-select-item-con close-ttag">
-      <input type="hidden" autocomplete="off" />
-    </div>
   </ul>
   <button type="button" class="btn-save">保 存</button>
 </body>
 <script>
   var TTAG = new Ttag({
-    el: '#ttag', maxSize: 0, value: ['hello', 'tag'], items: ['zho', '文'],
+    el: '#ttag', maxSize: 0, value: ['hello', 'tag'],
+    items: ['zho', '文'],
     url: 'https://www.fastmock.site/mock/84d3e3b92dfec7d39004365eaf127df8/chat/getTags',
-    // el: '#ttag', maxSize: 0, value: 'hello,tag', url: 'https://www.fastmock.site/mock/84d3e3b92dfec7d39004365eaf127df8/chat/getTags',
     onLoaded: function (data, ttagObj) {
       console.log('===')
       data = JSON.parse(data)
       console.log(data)
-      ttagObj.loadData(data.data);
+      ttagObj.loadItems(data.data);
     }, onCloseTag: function (delVal) {
       console.log(`${delVal} 值被删除了.`);
     }, onClickTag: function (tagVal) {
@@ -39,21 +36,7 @@
 
   console.log('看看会不会往下走');
 
-  /* var TTAG = new Ttag({
-    el: '#ttag', maxSize: 3, value: 'hello,tag', url: 'https://www.fastmock.site/mock/84d3e3b92dfec7d39004365eaf127df8/chat/getTags',
-    onLoaded: function (data, ttagObj) {
-      console.log('===')
-      data = JSON.parse(data)
-      console.log(data)
-      ttagObj.loadData(data.data);
-    }, onClose: function (delVal) {
-      // console.log(`${delVal} 值被删除了.`);
-    }, onTagClick: function (tagVal) {
-      // console.log(`${tagVal} 标签被点击`)
-    }, onAdd: function (curVal, formVal) {
-      // console.log(`${curVal} ${formVal}`)
-    }
-  }); */
+
 
   document.querySelector('.btn-save').addEventListener('click', function () {
     console.log('click...');
@@ -61,23 +44,7 @@
     console.log(formdata)
   })
 
-  /* fetch('https://www.fastmock.site/mock/84d3e3b92dfec7d39004365eaf127df8/chat/getTags', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  }).then(data => {
-    console.log('---');
-    console.log(data.json().then(d => {
-      var TTAG = new Ttag({
-        el: '#ttag', maxSize: 3, value: 'hello,tag', data: d.data, url: 'https://www.fastmock.site/mock/84d3e3b92dfec7d39004365eaf127df8/chat/getTags', onClose: function (delVal) {
-          console.log(`${delVal} 值被删除了.`);
-        }, onTagClick: function (tagVal) { console.log(`${tagVal} 标签被点击`) }, onAdd: function (curVal, formVal) {
-          console.log(`${curVal} ${formVal}`)
-        }
-      });
-    }))
-  }) */
+
 </script>
 
 </html>
