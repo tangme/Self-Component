@@ -5,7 +5,7 @@
 
 ## Ttag
 
-## constructor({el[,pattern = "&,&",value,url,maxSize,items,name,onCloseTag,onAddTag,onClickTag,onLoaded]})
+## constructor({el[,pattern = "&,&",value,url,maxSize,items,name,readonly=false,onCloseTag,onAddTag,onClickTag,onLoaded]})
 
 - `el` `<domselect>` 指定 dom id
 - `value` `<array>` 默认标签值
@@ -14,6 +14,7 @@
 - `maxSize` `<number>` 最大标签个数
 - `items` `<array>` 默认提供给用户选择的标签
 - `name` `<string>` input 隐藏域的 name 值
+- `readonly` `<string>` 是否只读
 - `onCloseTag` `<function>` 标签关闭事件
   - `val` `<string>` 被关闭标签的文本值
 - `onAddTag` `<function>` 新增标签事件

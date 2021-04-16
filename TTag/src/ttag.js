@@ -6,6 +6,7 @@ function Ttag({
 	maxSize = 0, //最多标签个数
 	items = [], //默认提供的标签选项
 	name, //表单name属性值
+	readonly = false,
 	onCloseTag = undefined, //关闭标签事件
 	onAddTag = undefined, //增加标签事件
 	onClickTag = undefined, //点击标签事件
@@ -20,7 +21,7 @@ function Ttag({
 	this.initDOM(name);
 	this.selectArea = this.editarea.querySelector(".t-tag-select-item-con"); //选择区域块，用来显示默认的标签
 	this.inputForm = this.selectArea.querySelector("input"); //隐藏的表单，用来存储实际值
-	this.tag = { _show: false, items }; //是否显示 默认标签选择区域块
+	this.tag = { _show: false, items, readonly }; //是否显示 默认标签选择区域块
 	this.hideSelTag = this.hideSelTag.bind(this); // 隐藏 默认标签选择区域块
 	this.maxSize = maxSize;
 	this.onCloseTag = onCloseTag;
@@ -124,6 +125,10 @@ Ttag.prototype.init = function () {
 			},
 		},
 	});
+
+	if (this.tag.readonly) {
+		return;
+	}
 	//编辑区域点击事件
 	this.editarea.addEventListener("click", function (event) {
 		event.stopPropagation();
@@ -241,6 +246,7 @@ Ttag.prototype.addTag = function (text, fireEvent) {
 
 	var textSpan = document.createElement("span");
 	textSpan.setAttribute("class", "edit-item-text");
+	this.tag.readonly && textSpan.setAttribute("class", "edit-item-text edit-item-text-readonly");
 	textSpan.innerHTML = text;
 	var closeSpan = document.createElement("span");
 	closeSpan.setAttribute("class", "edit-item-del");
@@ -248,7 +254,7 @@ Ttag.prototype.addTag = function (text, fireEvent) {
 	closeSpanCon.setAttribute("class", "edit-item-del-con");
 	closeSpanCon.appendChild(closeSpan);
 	li.appendChild(textSpan);
-	li.appendChild(closeSpanCon);
+	!this.tag.readonly && li.appendChild(closeSpanCon);
 	this.editarea.appendChild(li);
 
 	this.inputForm.value = this.inputForm.value + text + this.pattern;

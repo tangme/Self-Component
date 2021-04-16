@@ -11,14 +11,15 @@
 </head>
 
 <body>
-  <ul class="t-tag-con" id="ttag" style="display: inline-block;vertical-align: top;padding: 2px 0;">
-  </ul>
+  <div class="t-tag-con" id="ttag" style="vertical-align: top;">
+  </div>
   <button type="button" class="btn-save">保 存</button>
 </body>
 <script>
   var TTAG = new Ttag({
     el: '#ttag', maxSize: 0, value: ['hello', 'tag'],
     items: ['zho', '文'],
+    readonly: true,
     url: 'https://www.fastmock.site/mock/84d3e3b92dfec7d39004365eaf127df8/chat/getTags',
     onLoaded: function (data, ttagObj) {
       console.log('===')
