@@ -228,6 +228,19 @@ Ttag.prototype.getFormData = function (type) {
 		return this.inputForm.value.split(this.pattern);
 	}
 };
+
+Ttag.prototype.clean = function () {
+	// this.inputForm.value = "";
+	var childs = this.editarea.querySelectorAll(".edit-item");
+	if (childs.length) {
+		var childs = [].slice.call(childs);
+		childs.forEach((item) => {
+			this.delFormData(item.firstElementChild.textContent);
+			this.editarea.removeChild(item);
+		});
+	}
+};
+
 /**
  * [addTag 增加标签]
  * @Author tanglv   2020-11-02

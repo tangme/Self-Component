@@ -1,3 +1,10 @@
+<!--
+ * @Author: tanglv
+ * @Date: 2021-04-01 15:20:53
+ * @LastEditTime: 2022-06-16 15:07:29
+ * @LastEditors: tanglv
+ * @Description: 
+-->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -14,12 +21,13 @@
   <div class="t-tag-con" id="ttag" style="vertical-align: top;">
   </div>
   <button type="button" class="btn-save">保 存</button>
+  <button type="button" class="btn-clean">清 空</button>
 </body>
 <script>
   var TTAG = new Ttag({
     el: '#ttag', maxSize: 0, value: ['hello', 'tag'],
     items: ['zho', '文'],
-    readonly: true,
+    readonly: false,
     url: 'https://www.fastmock.site/mock/84d3e3b92dfec7d39004365eaf127df8/chat/getTags',
     onLoaded: function (data, ttagObj) {
       console.log('===')
@@ -37,7 +45,11 @@
 
   console.log('看看会不会往下走');
 
-
+  document.querySelector('.btn-clean').addEventListener('click', function () {
+    TTAG.clean();
+    var formdata = TTAG.getFormData()
+    console.log(formdata)
+  })
 
   document.querySelector('.btn-save').addEventListener('click', function () {
     console.log('click...');
