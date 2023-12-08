@@ -1,7 +1,7 @@
 <!--
  * @Author: tanglv
  * @Date: 2021-04-01 15:20:53
- * @LastEditTime: 2022-06-16 15:07:29
+ * @LastEditTime: 2022-07-26 17:53:30
  * @LastEditors: tanglv
  * @Description: 
 -->
@@ -25,9 +25,9 @@
 </body>
 <script>
   var TTAG = new Ttag({
-    el: '#ttag', maxSize: 0, value: ['hello', 'tag'],
+    el: '#ttag', maxSize: 0, value: ['hello', 'tag'],name:"fieldName",
     items: ['zho', '文'],
-    readonly: false,
+    readonly: true,
     url: 'https://www.fastmock.site/mock/84d3e3b92dfec7d39004365eaf127df8/chat/getTags',
     onLoaded: function (data, ttagObj) {
       console.log('===')
